@@ -35,19 +35,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController carPrice = TextEditingController();
   TextEditingController discount = TextEditingController();
+  TextEditingController downPayment = TextEditingController();
   TextEditingController interest = TextEditingController();
   TextEditingController installment = TextEditingController();
-  TextEditingController downPayment = TextEditingController();
   TextEditingController vat = TextEditingController();
   TextEditingController result1 = TextEditingController();
   TextEditingController result2 = TextEditingController();
   TextEditingController result3 = TextEditingController();
-  // TextEditingController result = TextEditingController();
-  // TextEditingController puretInterest = TextEditingController();
-  // TextEditingController carPriceNoTax = TextEditingController();
-  // TextEditingController carPriceIncludeVat = TextEditingController();
-  // TextEditingController installmentPerMonth = TextEditingController();
-  // TextEditingController payment = TextEditingController();
 
   @override
   void initState() {
@@ -62,8 +56,13 @@ class _HomeState extends State<Home> {
     return ListView(
       children: [
         // Padding(padding: const EdgeInsets.all(0.0)),
-        Image.asset("images/Vat.jpg",
-            height: 300, width: 100, fit: BoxFit.fitWidth),
+        Image.asset(
+          "assets/images/Vat.jpg",
+          fit: BoxFit.contain,
+
+          // width: 100,
+          // height: 100,
+        ),
         Padding(
           padding: const EdgeInsets.all(15.5),
           child: Text("โปรแกรมคำนวณค่างวดรถ",
@@ -77,6 +76,7 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.fromLTRB(60, 10, 60, 10),
           child: Center(
             child: TextField(
+                controller: carPrice,
                 style: TextStyle(fontFamily: "puimek"),
                 decoration: InputDecoration(
                     // contentPadding: EdgeInsets.all(20.0),
@@ -88,6 +88,7 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.fromLTRB(60, 10, 60, 10),
           child: Center(
             child: TextField(
+                controller: discount,
                 style: TextStyle(fontFamily: "puimek"),
                 decoration: InputDecoration(
                     labelText: "ส่วนลด (ถ้าไม่มีให้ใส่ 0) :",
@@ -98,6 +99,7 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.fromLTRB(60, 10, 60, 10),
           child: Center(
             child: TextField(
+                controller: downPayment,
                 style: TextStyle(fontFamily: "puimek"),
                 decoration: InputDecoration(
                     labelText: "เงินดาวน์ (บาท) :",
@@ -108,6 +110,7 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.fromLTRB(60, 10, 60, 10),
           child: Center(
             child: TextField(
+                controller: interest,
                 style: TextStyle(fontFamily: "puimek"),
                 decoration: InputDecoration(
                     labelText: "ดอกเบี้ย ( % ) :",
@@ -118,6 +121,7 @@ class _HomeState extends State<Home> {
           padding: const EdgeInsets.fromLTRB(60, 10, 60, 10),
           child: Center(
             child: TextField(
+                controller: installment,
                 style: TextStyle(fontFamily: "puimek"),
                 decoration: InputDecoration(
                     labelText: "ต้องการผ่อนกี่ปี ? :",
@@ -130,30 +134,28 @@ class _HomeState extends State<Home> {
             child: ElevatedButton(
               onPressed: () {
                 // calculater,
-                var carDiscount = (double.parse(carPrice.text) -
-                        double.parse(discount.text)) -
+                var carDiscount = double.parse(carPrice.text) -
+                    double.parse(discount.text) -
                     double.parse(downPayment.text);
-                var totalDiscount = double.parse(carPrice.text) +
-                    double.parse(discount.text) +
-                    double.parse(downPayment.text);
-                var vatPrice = (carDiscount * (double.parse(vat.text)) / 100);
-                var carNoVat = carDiscount - vatPrice;
-                var interestPrice =
-                    (double.parse(interest.text) / 100) * carDiscount;
+                print(carDiscount);
+
+                var carInterest =
+                    (double.parse(interest.text) / 100) * carDiscount +
+                        carDiscount;
+                print(carInterest);
+
                 var monthInstallment = double.parse(installment.text) * 12;
-                var resultInstallment =
-                    (carDiscount + interestPrice) / monthInstallment;
+                var resultInstallment = carInterest / monthInstallment;
                 print(
-                    "รถราคา $carPrice บาท ส่วนลดรวมเงินดาว $totalDiscount บาท");
-                print(
-                    "ภาษีมูลค่าเพิ่ม = $vatPrice บาท ราคารถไม่รวมภาษี = $carNoVat บาท");
+                    "รถราคา ${carPrice.text} บาท ส่วนลดรวมเงินดาว = $carDiscount บาท");
+                print("ราคารถรวมดอกเบี้ย = $carInterest บาท");
                 print(
                     "ผ่อนชำระจำนวณ $monthInstallment งวด งวดละ $resultInstallment บาท");
                 setState(() {
                   result1.text =
-                      "รถราคา $carPrice บาท ส่วนลดรวมเงินดาว $totalDiscount บาท";
-                  result2.text =
-                      "ภาษีมูลค่าเพิ่ม = $vatPrice บาท ราคารถไม่รวมภาษี = $carNoVat บาท";
+                      "รถราคา ${carPrice.text} บาท ส่วนลดรวมเงินดาว = $carDiscount บาท";
+
+                  result2.text = "ราคารถรวมดอกเบี้ย = $carInterest บาท";
                   result3.text =
                       "ผ่อนชำระจำนวณ $monthInstallment งวด งวดละ $resultInstallment บาท";
                 });
@@ -164,34 +166,25 @@ class _HomeState extends State<Home> {
                   padding: MaterialStateProperty.all(
                       EdgeInsets.fromLTRB(25, 15, 25, 15)),
                   textStyle: MaterialStateProperty.all(
-                      TextStyle(fontSize: 30, fontFamily: "puimek"))),
+                      TextStyle(fontSize: 30, fontFamily: "milktea"))),
             ),
           ),
         ),
-        Text(result1.text),
-        Text(result2.text),
-        Text(result3.text),
+        SizedBox(
+          height: 15,
+        ),
+
+        Text(result1.text,
+            style: TextStyle(fontFamily: "milktea", fontSize: 21)),
+        Text(result2.text,
+            style: TextStyle(fontFamily: "milktea", fontSize: 21)),
+        Text(result3.text,
+            style: TextStyle(fontFamily: "milktea", fontSize: 21)),
+
+        SizedBox(
+          height: 15,
+        ),
       ],
     );
   }
-
-  // void calculater() {
-  //   setState(() {
-  //     var puretInterest = (double.parse(interest.text) / 100);
-  //     var carPriceNoTax = (double.parse(carPrice.text) -
-  //         double.parse(discount.text) -
-  //         double.parse(downPayment.text));
-  //     var carPriceIncludeVat = (carPriceNoTax * vat);
-  //     var carPriceIncludeTax =
-  //         (carPriceNoTax + (puretInterest * carPriceNoTax));
-  //     var installmentPerMonth = double.parse(installment.text) * 12;
-  //     var payment = carPriceIncludeTax / installmentPerMonth;
-  //     print("ราคารถรวม Vat = ${carPriceIncludeVat} บาท");
-  //     print("ค่างวดรถ = ${payment}");
-  //     setState(() {
-  //       result.text =
-  //           "ราคารถรวม Vat = ${carPriceIncludeVat} บาท ค่างวดรถ = ${payment}";
-  //     });
-  //   });
-  // }
 }
